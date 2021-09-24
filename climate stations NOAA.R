@@ -21,5 +21,8 @@ ghcnd_stations_spec  <- plyr::rename(ghcnd_stations_spec, c("X1" = "WScode", "X2
 glimpse(ghcnd_stations_spec)
 View(ghcnd_stations_spec)
 
+#Next step (https://github.com/bczernecki/climate)
+#if (!require('climate')) install.packages('climate'); library('climate')
+#NZL = stations_ogimet(country = "NZWD", add_map = TRUE)
 
 
