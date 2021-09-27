@@ -1,60 +1,60 @@
-#Federico Tomasetto
-#9th September 2021
-#MPI-R Shiny project
+rm(list = ls())
+library(tidyverse)
 
-getwd()
-setwd(choose.dir(default = "", caption = "Select folder"))
+#------------------------------------------------------------------
+# Get data from (https://databasin.org/datasets/15a31dec689b4c958ee491ff30fcce75/)
 
-if (!require('tidyverse')) install.packages('tidyverse'); library('tidyverse')
-if (!require('foreign')) install.packages('foreign'); library('foreign')
-if (!require('gt')) install.packages('gt'); library('gt')
+wc <- readRDS('./wc_stations1.rds') # I save a local copy
+# wc <- foreign::read.dbf("stations1.dbf", as.is = TRUE) # don't need factors
+# saveRDS(wc, './wc_stations1.rds')
 
-#Get data from (https://databasin.org/datasets/15a31dec689b4c958ee491ff30fcce75/)
-clim.stat.wc1 <- read.dbf("C:/Users/TOMASETTOF/OneDrive - AgResearch/Documents/GitHub/Worldclim-stations/climate stations/Data0/stations1.dbf", as.is = FALSE)
+glimpse(wc)
 
 #Summarize data per country
-clim.stat.country1 <- clim.stat.wc1 %>% 
+cntry <- wc %>% 
   group_by(COUNTRY) %>%
-  summarise(count = n_distinct(WCID))
-clim.stat.country1                 
+  summarise(count = n(), .groups = 'drop')
 
-#Export data as table
-write.table(clim.stat.country1, file = "Worldclim stations per country.txt", sep = ",")
+glimpse(cntry)
+sum(cntry$count) # 55879
 
-#Export data for presentation
-wclim.table1 <- 
-  clim.stat.country1 %>% 
-  gt()%>%
-    tab_header(title = md("Worldclim stations = 56,000"))
+#------------------------------------------------------------------
+# Extract only climate stations data with Precipitation, Tmin & Tmax
+any(is.na(wc$RAINID)) # check if contains both NA & "NA"
+any(is.na(wc$TMINID)) 
+any(is.na(wc$TMAXID)) 
 
-wclim.table1 %>%
-  gtsave("Worldclim stations per country.html", inline_css = TRUE)
+# wc %>% filter(RAINID!="NA", TMINID!="NA", TMAXID!="NA") # this line did not write the filtered data to wc, & the filter should be "&" rather than ","
 
-#------------------------------------------------------------------#
-#Extract only climate stations data with Precipitation, Tmin & Tmax
-glimpse(clim.stat.wc1)
-
-clim.stat.wc1 %>% filter(RAINID!="NA", TMINID!="NA", TMAXID!="NA")
-
-#Summarize data per country
-clim.stat.country2 <- clim.stat.wc1 %>% 
+# Summarize data with 3 vars per country
+vars3 <- wc %>% 
+	filter(RAINID != "NA" & TMINID != "NA" & TMAXID != "NA") %>%
   group_by(COUNTRY) %>%
-  summarise(count = n_distinct(WCID))
-clim.stat.country2                 
+  summarise(with3vars = n(), .groups = 'drop')
 
-#Export data as table
-write.table(clim.stat.country2, file = "Worldclim stations per country no NAs.txt", sep = ",")
+glimpse(vars3)
 
-#Export data for presentation
-wclim.table2 <- 
-  clim.stat.country2 %>% 
-  gt()%>%
-  tab_header(title = md("Worldclim stations no Ptt NAs = 10,400"))
+sum(vars3$with3vars) # 10531
 
-wclim.table2 %>%
-  gtsave("Worldclim stations without Ptt NAs.html", inline_css = TRUE)
+#------------------------------------------------------------------
+# Look at summarised data
+summ <- left_join(cntry, vars3, by = 'COUNTRY')
 
+mycap <- paste('Total climate stations is', sum(cntry$count), 'and stations with our 3 vars is',  sum(vars3$with3vars))
 
+summ %>%
+	arrange(desc(with3vars)) %>%
+  DT::datatable(caption = mycap, options = list(pageLength = 20))
+
+#------------------------------------------------------------------
+# Plot locations
+ggplot() +
+	geom_point(data = wc, aes(x = LONG, y = LAT), colour = 'grey50', size = 1) +
+	geom_point(data = filter(wc, RAINID != "NA" & TMINID != "NA" & TMAXID != "NA"),
+		aes(x = LONG, y = LAT), colour = 'red', size = .5) +
+	ggtitle('All climate stations (grey) & with our 3 variables (red)') +
+	theme_bw() +
+	coord_equal()
 
 
 
