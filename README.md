@@ -1,2 +1,2 @@
-# Worldclim-stations
-Initial data wrangling of weather stations from Worldclim 2017  
+# Climate stations from NOAA
+Initial data wrangling of weather stations from NOAA website to be used for MPI  
