@@ -1,6 +1,8 @@
 # R NOAA 
 # Getting climate data from NOAA Stations (https://cran.r-project.org/web/packages/rnoaa/rnoaa.pdf)
 
+#Read (https://github.com/ropensci/rnoaa)
+
 if (!require("rnoaa")) install.packages("rnoaa"); library(rnoaa)
 
 #Get an API key (aka, token) at https://www.ncdc.noaa.gov/cdo-web/token
