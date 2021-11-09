@@ -55,6 +55,7 @@ summ %>%
 #------------------------------------------------------------------
 w <- map_data('world')
 
+#x11()
 ggplot() +
 	geom_polygon(data = w, aes(x = long, y = lat, group = group), colour = 'grey50', fill = 'white') +
 #	geom_point(data = wc, aes(x = LONG, y = LAT), colour = 'grey50', size = 1) +
@@ -69,13 +70,16 @@ ggplot() +
 #------------------------------------------------------------------
 wc2 <- wc %>% 
 	filter(RAINID != "NA" & TMINID != "NA" & TMAXID != "NA") %>%
-	select(-c(RAINID: TMEANID))
+  dplyr::select(-c(RAINID: TMEANID))
 
 length(which(is.na(wc2$COUNTRY)))	
 length(unique(wc2$NAME)) # 10105
 # tail(sort(unique(wc2$NAME)), n = 100)
 
 glimpse(wc2)
+
+#Export locations for next exercise
+#write.csv(wc2,"C://Users//TOMASETTOF//OneDrive - AgResearch//Documents//GitHub//world_clim//wc2.csv", row.names = FALSE)
   
 library(leaflet)
 
