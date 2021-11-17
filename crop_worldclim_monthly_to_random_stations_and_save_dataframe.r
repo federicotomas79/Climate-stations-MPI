@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 # 20201028 Craig Phillips AGR Demo script for extracting monthly climate records from worldclim rasters and interpolating them to weekly
 
 rm(list = ls())
@@ -72,7 +71,7 @@ wc2 <- read.csv('./wc2.csv')
 class(wc2)
 
 # Select inland stations using "WCID"
-wc2rnd <- wc2 %in% filter("33111", "55020", "48521", "17110", "11867", "40431", "18153", "29650", "54050", "20626")
+wc2rnd <- filter (wc2, WCID %in% c("33111", "55020", "48521", "17110", "11867", "40431", "18153", "29650", "54050", "20626"))
 
 # Selecting locations with locator (not ideal right now)
 #rndmp1 <- locator(10, type="p", col="red", pch=20)
